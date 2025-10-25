@@ -1,0 +1,3 @@
+[submodule "vendors/CFGpp"]
+	path = vendors/CFGpp
+	url = https://github.com/CFGpp-diffusion/CFGpp.git
