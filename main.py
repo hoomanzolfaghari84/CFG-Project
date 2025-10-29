@@ -5,7 +5,7 @@ from munch import munchify
 from torchvision.utils import save_image
 
 from vendors.CFGpp.latent_diffusion import get_solver
-from vendors.CFGpp.latent_sdxl import get_solver as get_solver_sdxl
+# from vendors.CFGpp.latent_sdxl import get_solver as get_solver_sdxl
 from vendors.CFGpp.utils.callback_util import ComposeCallback
 from vendors.CFGpp.utils.log_util import create_workdir, set_seed
 
@@ -35,16 +35,16 @@ def main():
 
 
     if args.model == "sdxl" or args.model == "sdxl_lightning":
-        solver = get_solver_sdxl(args.method,
-                                 solver_config=solver_config,
-                                 device=args.device)
+        # solver = get_solver_sdxl(args.method,
+        #                          solver_config=solver_config,
+        #                          device=args.device)
 
-        result = solver.sample(prompt1=[args.null_prompt, args.prompt],
-                                prompt2=[args.null_prompt, args.prompt],
-                                cfg_guidance=args.cfg_guidance,
-                                target_size=(1024, 1024),
-                                callback_fn=callback)
-
+        # result = solver.sample(prompt1=[args.null_prompt, args.prompt],
+        #                         prompt2=[args.null_prompt, args.prompt],
+        #                         cfg_guidance=args.cfg_guidance,
+        #                         target_size=(1024, 1024),
+        #                         callback_fn=callback)
+        raise Exception("SDXL model not supported in this setup.")
     else:
         solver = get_solver(args.method,
                             solver_config=solver_config,
