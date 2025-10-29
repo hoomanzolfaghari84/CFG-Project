@@ -3,27 +3,22 @@ from vendors.CFGpp.latent_diffusion import *
 def tangent_plane_projection(main_point, uncond_points, guided_update):
     """
     Projects guided update onto the plane defined by 3 unconditional points.
-    Args:
-        main_point: torch.Tensor of shape [B, C, H, W] (the main latent)
-        uncond_points: list of 3 torch.Tensor latents [p0, p1, p2]
-        guided_update: torch.Tensor, the conditional (CFG) update
-    Returns:
-        projected_update: guided update projected onto tangent plane
     """
     p0, p1, p2 = uncond_points
-    v1 = (p1 - p0).view(-1)
-    v2 = (p2 - p0).view(-1)
-    
-    # Orthonormalize
-    b1 = v1 / (v1.norm() + 1e-8)
-    v2 = v2 - (v2 @ b1) * b1
-    b2 = v2 / (v2.norm() + 1e-8)
-    
-    # Project the guided update onto the plane
-    delta = (main_point - p0).view(-1) + guided_update.view(-1)
-    proj = (delta @ b1) * b1 + (delta @ b2) * b2
-    projected = p0.view(-1) + proj
-    return projected.view_as(main_point)
+    V = torch.stack([p1 - p0, p2 - p0], dim=0)  # basis vectors of the plane
+
+    # Compute projection matrix safely in float32
+    VtV = (V @ V.T).to(torch.float32)
+    try:
+        invVtV = torch.inverse(VtV)
+    except RuntimeError:
+        invVtV = torch.pinverse(VtV)
+
+    # Compute projection
+    P = V.T @ invVtV @ V
+    proj_update = guided_update - (guided_update - (P @ guided_update.T).T)
+
+    return proj_update
 
 
 @register_solver("ddim_cfg_tangent")
