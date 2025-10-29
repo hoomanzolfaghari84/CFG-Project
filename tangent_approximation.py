@@ -1,26 +1,5 @@
 from vendors.CFGpp.latent_diffusion import *
 
-def tangent_plane_projection(main_point, uncond_points, guided_update):
-    """
-    Projects guided update onto the plane defined by 3 unconditional points.
-    """
-    p0, p1, p2 = uncond_points
-    V = torch.stack([p1 - p0, p2 - p0], dim=0)
-
-    # Disable autocast to ensure float32 math
-    with torch.cuda.amp.autocast(enabled=False):
-        V = V.float()  # convert to float32 explicitly
-        VtV = V @ V.T
-        try:
-            invVtV = torch.inverse(VtV)
-        except RuntimeError:
-            invVtV = torch.pinverse(VtV)
-        P = V.T @ invVtV @ V
-        proj_update = (P @ guided_update.T).T
-
-    # Convert result back to same dtype as input
-    return proj_update.to(guided_update.dtype)
-
 
 @register_solver("ddim_cfg_tangent")
 class TangentDiffusion(StableDiffusion):
