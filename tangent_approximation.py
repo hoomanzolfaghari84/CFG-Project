@@ -70,7 +70,7 @@ class TangentDiffusion(StableDiffusion):
         # 4 trajectories stacked (0..2 unconditional, 3 conditional)
         # zt = torch.cat([zT.clone() for _ in range(4)], dim=0)  # (4, C, H, W)
         
-        print(f"zt shape: {zt.shape()}")
+        print(f"zt shape: {zt.shape}")
 
         z1_t = zt.clone()
         z2_t = zt.clone()
